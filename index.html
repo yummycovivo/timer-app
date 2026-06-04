@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pomodoro Timer</title>
+  <meta name="description" content="A beautiful multi-profile timer for focused work sessions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient-glow" id="ambientGlow"></div>
+
+  <!-- Theme selector -->
+  <button class="theme-toggle" id="themeToggle" title="Themes">
+    <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+  </button>
+  <div class="theme-context profile-context" id="themeContext">
+    <button class="profile-context-item" data-theme="dark">Dark Mode</button>
+    <button class="profile-context-item" data-theme="light">Light Mode</button>
+    <button class="profile-context-item" data-theme="moon">Moon Mode</button>
+    <button class="profile-context-item" data-theme="winter">Winter</button>
+    <button class="profile-context-item" data-theme="autumn">Autumn</button>
+    <button class="profile-context-item" data-theme="spring">Spring</button>
+    <button class="profile-context-item" data-theme="summer">Summer</button>
+  </div>
+
+  <!-- Profile selector bar -->
+  <nav class="profile-bar" id="profileBar">
+    <!-- Tabs rendered dynamically by JS -->
+  </nav>
+
+  <!-- Right-click / long-press context menu for profiles -->
+  <div class="profile-context" id="profileContext">
+    <button class="profile-context-item" id="ctxEdit">Edit</button>
+    <button class="profile-context-item" id="ctxDuplicate">Duplicate</button>
+    <button class="profile-context-item danger" id="ctxDelete">Delete</button>
+  </div>
+
+  <!-- Profile create / edit modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2 id="modalTitle">New Profile</h2>
+
+      <div class="modal-field">
+        <label for="modalName">Name</label>
+        <input type="text" id="modalName" placeholder="My Timer" maxlength="24">
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label for="modalWork">Focus</label>
+          <input type="number" id="modalWork" value="25" min="1" max="180">
+        </div>
+        <div class="modal-field">
+          <label for="modalShort">Short</label>
+          <input type="number" id="modalShort" value="5" min="1" max="60">
+        </div>
+        <div class="modal-field">
+          <label for="modalLong">Long</label>
+          <input type="number" id="modalLong" value="20" min="1" max="90">
+        </div>
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label for="modalSessions">Sessions</label>
+          <input type="number" id="modalSessions" value="4" min="1" max="12">
+        </div>
+      </div>
+
+      <div class="modal-field">
+        <label>Color</label>
+        <div class="color-swatches" id="colorSwatches">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="modalCancel">Cancel</button>
+        <button class="modal-btn modal-btn-save" id="modalSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase-label" id="phaseLabel">FOCUS</div>
+
+  <div class="timer-container">
+    <svg class="timer-ring" viewBox="0 0 320 320">
+      <circle class="ring-track" cx="160" cy="160" r="154"></circle>
+      <circle class="ring-progress" id="ringProgress" cx="160" cy="160" r="154"
+        stroke-dasharray="967.6"
+        stroke-dashoffset="0">
+      </circle>
+    </svg>
+    <div class="timer-display">
+      <div class="time-text" id="timeText">25:00</div>
+      <div class="session-info" id="sessionInfo">SESSION 1 OF 4</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-secondary" id="btnReset" title="Reset">
+      <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+    <button class="btn btn-primary" id="btnPlay" title="Start">
+      <svg id="iconPlay" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+      <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+    </button>
+    <button class="btn btn-secondary" id="btnSkip" title="Skip">
+      <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+    </button>
+  </div>
+
+  <div class="sessions" id="sessionDots"></div>
+
+  <div class="notification" id="notification"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
