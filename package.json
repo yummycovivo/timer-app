@@ -1,0 +1,26 @@
+{
+  "name": "timer",
+  "version": "1.0.0",
+  "description": "sigma",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yummycovivo/timer-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yummycovivo/timer-app/issues"
+  },
+  "homepage": "https://github.com/yummycovivo/timer-app#readme",
+  "devDependencies": {
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.2",
+    "electron-packager": "^17.1.2"
+  }
+}
