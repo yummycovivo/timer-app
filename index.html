@@ -1,20 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pomodoro Timer</title>
   <meta name="description" content="A beautiful multi-profile timer for focused work sessions.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="ambient-glow" id="ambientGlow"></div>
 
   <!-- Theme selector -->
   <button class="theme-toggle" id="themeToggle" title="Themes">
-    <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+    <svg viewBox="0 0 24 24">
+      <path
+        d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" />
+    </svg>
+  </button>
+
+  <!-- Settings selector -->
+  <button class="theme-toggle" id="settingsToggle" title="Settings" style="right: 72px;">
+    <svg viewBox="0 0 24 24">
+      <path
+        d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z" />
+    </svg>
   </button>
   <div class="theme-context profile-context" id="themeContext">
     <button class="profile-context-item" data-theme="dark">Dark Mode</button>
@@ -84,13 +98,27 @@
     </div>
   </div>
 
+  <!-- Settings modal -->
+  <div class="modal-overlay" id="settingsOverlay">
+    <div class="modal">
+      <h2>Settings</h2>
+      <div class="modal-field">
+        <label for="settingsTimeDelta">Add/Remove Time Amount (Seconds)</label>
+        <input type="number" id="settingsTimeDelta" value="15" min="1" max="3600">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="settingsCancel">Close</button>
+        <button class="modal-btn modal-btn-save" id="settingsSave">Save</button>
+      </div>
+    </div>
+  </div>
+
   <div class="phase-label" id="phaseLabel">FOCUS</div>
 
   <div class="timer-container">
     <svg class="timer-ring" viewBox="0 0 320 320">
       <circle class="ring-track" cx="160" cy="160" r="154"></circle>
-      <circle class="ring-progress" id="ringProgress" cx="160" cy="160" r="154"
-        stroke-dasharray="967.6"
+      <circle class="ring-progress" id="ringProgress" cx="160" cy="160" r="154" stroke-dasharray="967.6"
         stroke-dashoffset="0">
       </circle>
     </svg>
@@ -101,15 +129,35 @@
   </div>
 
   <div class="controls">
+    <button class="btn btn-secondary" id="btnRemoveTime" title="Remove Time">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 13H5v-2h14v2z" />
+      </svg>
+    </button>
     <button class="btn btn-secondary" id="btnReset" title="Reset">
-      <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+      </svg>
     </button>
     <button class="btn btn-primary" id="btnPlay" title="Start">
-      <svg id="iconPlay" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
-      <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+      <svg id="iconPlay" viewBox="0 0 24 24">
+        <polygon points="6,3 20,12 6,21" />
+      </svg>
+      <svg id="iconPause" viewBox="0 0 24 24" style="display:none">
+        <rect x="5" y="3" width="4" height="18" />
+        <rect x="15" y="3" width="4" height="18" />
+      </svg>
     </button>
     <button class="btn btn-secondary" id="btnSkip" title="Skip">
-      <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      <svg viewBox="0 0 24 24">
+        <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+      </svg>
+    </button>
+    <button class="btn btn-secondary" id="btnAddTime" title="Add Time">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+      </svg>
     </button>
   </div>
 
@@ -119,4 +167,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>

@@ -4,31 +4,31 @@
 
 // ── Color palette for profiles ──────────────────────────────────
 const PALETTE = [
-  { hue: 0,   label: 'Red',    color: 'hsl(0, 85%, 62%)',   glow: 'hsl(0, 90%, 55%)'   },
-  { hue: 25,  label: 'Orange', color: 'hsl(25, 90%, 58%)',  glow: 'hsl(25, 95%, 52%)'  },
-  { hue: 45,  label: 'Amber',  color: 'hsl(45, 90%, 55%)',  glow: 'hsl(45, 95%, 48%)'  },
-  { hue: 150, label: 'Green',  color: 'hsl(150, 70%, 50%)', glow: 'hsl(150, 80%, 45%)' },
-  { hue: 190, label: 'Cyan',   color: 'hsl(190, 80%, 55%)', glow: 'hsl(190, 85%, 48%)' },
-  { hue: 220, label: 'Blue',   color: 'hsl(220, 85%, 62%)', glow: 'hsl(220, 90%, 55%)' },
+  { hue: 0, label: 'Red', color: 'hsl(0, 85%, 62%)', glow: 'hsl(0, 90%, 55%)' },
+  { hue: 25, label: 'Orange', color: 'hsl(25, 90%, 58%)', glow: 'hsl(25, 95%, 52%)' },
+  { hue: 45, label: 'Amber', color: 'hsl(45, 90%, 55%)', glow: 'hsl(45, 95%, 48%)' },
+  { hue: 150, label: 'Green', color: 'hsl(150, 70%, 50%)', glow: 'hsl(150, 80%, 45%)' },
+  { hue: 190, label: 'Cyan', color: 'hsl(190, 80%, 55%)', glow: 'hsl(190, 85%, 48%)' },
+  { hue: 220, label: 'Blue', color: 'hsl(220, 85%, 62%)', glow: 'hsl(220, 90%, 55%)' },
   { hue: 270, label: 'Purple', color: 'hsl(270, 70%, 62%)', glow: 'hsl(270, 80%, 55%)' },
-  { hue: 330, label: 'Pink',   color: 'hsl(330, 75%, 60%)', glow: 'hsl(330, 80%, 55%)' },
+  { hue: 330, label: 'Pink', color: 'hsl(330, 75%, 60%)', glow: 'hsl(330, 80%, 55%)' },
 ];
 
 // ── Default preset profiles ────────────────────────────────────
 const DEFAULT_PROFILES = [
-  { id: 'pomodoro',     name: 'Pomodoro',     work: 25, short: 5,  long: 20, sessions: 4, colorIdx: 0, preset: true },
-  { id: 'deep-work',    name: 'Deep Work',    work: 90, short: 20, long: 30, sessions: 2, colorIdx: 6, preset: true },
-  { id: '52-17',        name: '52 / 17',      work: 52, short: 17, long: 17, sessions: 3, colorIdx: 2, preset: true },
-  { id: 'short-sprint', name: 'Short Sprint', work: 15, short: 3,  long: 10, sessions: 6, colorIdx: 4, preset: true },
-  { id: 'flowtime',     name: 'Flowtime',     work: 50, short: 10, long: 20, sessions: 3, colorIdx: 3, preset: true },
+  { id: 'pomodoro', name: 'Pomodoro', work: 25, short: 5, long: 20, sessions: 4, colorIdx: 0, preset: true },
+  { id: 'deep-work', name: 'Deep Work', work: 90, short: 20, long: 30, sessions: 2, colorIdx: 6, preset: true },
+  { id: '52-17', name: '52 / 17', work: 52, short: 17, long: 17, sessions: 3, colorIdx: 2, preset: true },
+  { id: 'short-sprint', name: 'Short Sprint', work: 15, short: 3, long: 10, sessions: 6, colorIdx: 4, preset: true },
+  { id: 'flowtime', name: 'Flowtime', work: 50, short: 10, long: 20, sessions: 3, colorIdx: 3, preset: true },
 ];
 
 // ── Constants ───────────────────────────────────────────────────
 const CIRCUMFERENCE = 2 * Math.PI * 154;
 const PHASES = { WORK: 'work', SHORT: 'short', LONG: 'long' };
 const STORAGE_KEY = 'timer_profiles';
-const ACTIVE_KEY  = 'timer_active_profile';
-const THEME_KEY   = 'timer_theme';
+const ACTIVE_KEY = 'timer_active_profile';
+const THEME_KEY = 'timer_theme';
 
 // ── State ───────────────────────────────────────────────────────
 let profiles = [];
@@ -41,6 +41,7 @@ let isRunning = false;
 let interval = null;
 let sessionCount = 0;
 let currentSession = 1;
+let timeDelta = parseInt(localStorage.getItem('timer_time_delta')) || 15;
 
 // Modal state
 let editingProfileId = null; // null = creating, string = editing
@@ -51,35 +52,44 @@ let contextProfileId = null;
 let themeContextOpen = false;
 
 // ── DOM References ──────────────────────────────────────────────
-const $time        = document.getElementById('timeText');
-const $phase       = document.getElementById('phaseLabel');
-const $session     = document.getElementById('sessionInfo');
-const $ring        = document.getElementById('ringProgress');
-const $play        = document.getElementById('btnPlay');
-const $iconPlay    = document.getElementById('iconPlay');
-const $iconPause   = document.getElementById('iconPause');
-const $reset       = document.getElementById('btnReset');
-const $skip        = document.getElementById('btnSkip');
-const $dots        = document.getElementById('sessionDots');
+const $time = document.getElementById('timeText');
+const $phase = document.getElementById('phaseLabel');
+const $session = document.getElementById('sessionInfo');
+const $ring = document.getElementById('ringProgress');
+const $play = document.getElementById('btnPlay');
+const $iconPlay = document.getElementById('iconPlay');
+const $iconPause = document.getElementById('iconPause');
+const $reset = document.getElementById('btnReset');
+const $skip = document.getElementById('btnSkip');
+const $btnAddTime = document.getElementById('btnAddTime');
+const $btnRemoveTime = document.getElementById('btnRemoveTime');
+const $dots = document.getElementById('sessionDots');
 const $notification = document.getElementById('notification');
-const $profileBar  = document.getElementById('profileBar');
+const $profileBar = document.getElementById('profileBar');
+
+// Settings Modal
+const $settingsToggle = document.getElementById('settingsToggle');
+const $settingsOverlay = document.getElementById('settingsOverlay');
+const $settingsTimeDelta = document.getElementById('settingsTimeDelta');
+const $settingsCancel = document.getElementById('settingsCancel');
+const $settingsSave = document.getElementById('settingsSave');
 
 // Modal
 const $modalOverlay = document.getElementById('modalOverlay');
-const $modalTitle   = document.getElementById('modalTitle');
-const $modalName    = document.getElementById('modalName');
-const $modalWork    = document.getElementById('modalWork');
-const $modalShort   = document.getElementById('modalShort');
-const $modalLong    = document.getElementById('modalLong');
+const $modalTitle = document.getElementById('modalTitle');
+const $modalName = document.getElementById('modalName');
+const $modalWork = document.getElementById('modalWork');
+const $modalShort = document.getElementById('modalShort');
+const $modalLong = document.getElementById('modalLong');
 const $modalSessions = document.getElementById('modalSessions');
 const $colorSwatches = document.getElementById('colorSwatches');
-const $modalCancel  = document.getElementById('modalCancel');
-const $modalSave    = document.getElementById('modalSave');
+const $modalCancel = document.getElementById('modalCancel');
+const $modalSave = document.getElementById('modalSave');
 
 // Context menu
-const $ctx       = document.getElementById('profileContext');
-const $ctxEdit   = document.getElementById('ctxEdit');
-const $ctxDup    = document.getElementById('ctxDuplicate');
+const $ctx = document.getElementById('profileContext');
+const $ctxEdit = document.getElementById('ctxEdit');
+const $ctxDup = document.getElementById('ctxDuplicate');
 const $ctxDelete = document.getElementById('ctxDelete');
 
 // Theme Context
@@ -107,7 +117,7 @@ function loadProfiles() {
   if (!profiles.find(p => p.id === activeProfileId)) {
     activeProfileId = profiles[0].id;
   }
-  
+
   activeTheme = localStorage.getItem(THEME_KEY) || 'dark';
   applyTheme(activeTheme);
 }
@@ -357,6 +367,25 @@ function skipPhase() {
   advancePhase();
 }
 
+function addTime() {
+  totalSeconds += timeDelta;
+  secondsLeft += timeDelta;
+  updateDisplay();
+  showNotification(`+${timeDelta}s`);
+}
+
+function removeTime() {
+  if (secondsLeft <= timeDelta) {
+    secondsLeft = 0;
+    tick();
+  } else {
+    secondsLeft -= timeDelta;
+    totalSeconds -= timeDelta;
+    updateDisplay();
+    showNotification(`-${timeDelta}s`);
+  }
+}
+
 // ── Context menu ───────────────────────────────────────────────
 function openContextMenu(e, profileId) {
   contextProfileId = profileId;
@@ -545,12 +574,37 @@ $modalSave.addEventListener('click', () => {
 $play.addEventListener('click', () => isRunning ? stopTimer() : startTimer());
 $reset.addEventListener('click', resetTimer);
 $skip.addEventListener('click', skipPhase);
+$btnAddTime.addEventListener('click', addTime);
+$btnRemoveTime.addEventListener('click', removeTime);
+
+$settingsToggle.addEventListener('click', () => {
+  $settingsTimeDelta.value = timeDelta;
+  $settingsOverlay.classList.add('open');
+});
+
+function closeSettings() {
+  $settingsOverlay.classList.remove('open');
+}
+
+$settingsCancel.addEventListener('click', closeSettings);
+$settingsOverlay.addEventListener('click', (e) => {
+  if (e.target === $settingsOverlay) closeSettings();
+});
+
+$settingsSave.addEventListener('click', () => {
+  const val = parseInt($settingsTimeDelta.value);
+  if (!isNaN(val) && val > 0) {
+    timeDelta = val;
+    localStorage.setItem('timer_time_delta', timeDelta);
+  }
+  closeSettings();
+});
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   // Don't capture keys when modal is open or typing in input
-  if ($modalOverlay.classList.contains('open')) {
-    if (e.code === 'Escape') closeModal();
+  if ($modalOverlay.classList.contains('open') || $settingsOverlay.classList.contains('open')) {
+    if (e.code === 'Escape') { closeModal(); closeSettings(); }
     return;
   }
   if (e.target.tagName === 'INPUT') return;
