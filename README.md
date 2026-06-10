@@ -1,3 +1,4 @@
 # timer-app
-sigma
 
+compatible with windows and macos
+.exe .app respectively
